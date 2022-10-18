@@ -27,4 +27,5 @@ Manifest.toml
 *.so
 *.dylib
 *.jld2
+.DS_Store
 
