@@ -20,7 +20,7 @@ module Config
     # portion of (x, y) phase space to consider (for basins)
     lb = -1.5
     ub = 1.5
-    grid_size = 300
+    grid_size = 200
     x₀_range = range(lb, ub, grid_size)
     y₀_range = range(lb, ub, grid_size)
 
@@ -49,7 +49,7 @@ module Config
         fontsize = 10,
         fontcolor = almost_black,
         textcolor = almost_black,
-        figure_padding = (0, 0, 0, 0),
+        # figure_padding = (0, 0, 0, 0),
         backgroundcolor = :white,
         Axis = (
             titlesize = 12,
@@ -70,10 +70,10 @@ module Config
             spinewidth=0.75
         ),
         Label = (
-            font = "Arial",
+            font = "Arial Bold",
             textsize = 16,
             color = almost_black,
-            halign = :left
+            halign = :center
         ),
         Legend = (
             framevisible=false,
