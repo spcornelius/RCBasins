@@ -1,4 +1,4 @@
-name = "NextGenRCBasins"
+name = "RCBasins"
 uuid = "88833477-e86a-4654-8d8d-2c76bc2de198"
 authors = ["Sean P. Cornelius <spcornelius@gmail.com>"]
 version = "0.1.0"

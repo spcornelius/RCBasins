@@ -1,4 +1,4 @@
-module NextGenRCBasins
+module RCBasins
 
 import Configurations: from_dict
 

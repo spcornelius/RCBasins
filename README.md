@@ -1,12 +1,12 @@
-# NextGenRCBasins
-`NextGenRCBasins` is a Julia package that implements the [Next Generation Reservoir Computing](https://www.nature.com/articles/s41467-021-25801-2) (NGRC) framework for data-driving learning of dynamical systems, and applies it to the problem of predicting [basins of attraction](https://www.scholarpedia.org/article/Basin_of_attraction) in the [Magnetic Pendulum](https://ima.org.uk/13908/chaos-in-the-magnetic-pendulum/) system. 
+# RCBasins
+`RCBasins` is a Julia package that implements the [Next Generation Reservoir Computing](https://www.nature.com/articles/s41467-021-25801-2) (NGRC) framework for data-driving learning of dynamical systems, and applies it to the problem of predicting [basins of attraction](https://www.scholarpedia.org/article/Basin_of_attraction) in the [Magnetic Pendulum](https://ima.org.uk/13908/chaos-in-the-magnetic-pendulum/) system. 
 
 # Overview
 This package defines methods to train and simulate NGRC models from time series data, and implements the magnetic pendulum dynamics (see `MagneticPendulum`). It also includes utility functions for mapping the basins of attraction according to either the real Magnetic Pendulum ODEs or a trained NGRC model in parallel using multiple CPUs.
 
 # System Requirements
 ## Hardware requirements
-`NextGenRCBasins` requires only a standard computer with sufficient RAM to store and operate on 
+`RCBasins` requires only a standard computer with sufficient RAM to store and operate on 
 training data sets of the specified size.
 
 ## Software Requirements
@@ -23,8 +23,8 @@ This package and demo script rely on the Julia packages listed in the [Project.t
 # Installation Guide
 Clone this repository, enter the working directory, and start Julia:
 ```bash
-git clone git@github.com:spcornelius/NextGenRCBasins.git
-cd NextGenRCBasins
+git clone git@github.com:spcornelius/RCBasins.git
+cd RCBasins
 julia --project
 ```
 

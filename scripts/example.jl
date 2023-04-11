@@ -5,7 +5,7 @@ using Distributions
 using LaTeXStrings
 using LinearAlgebra
 using Makie
-using NextGenRCBasins
+using RCBasins
 using OrdinaryDiffEq
 using ProgressMeter
 using Random
@@ -58,7 +58,7 @@ train_times = 0:Δt:t_train
 #######################################
 
 setup_workers()
-@everywhere using NextGenRCBasins, DifferentialEquations, ProgressMeter
+@everywhere using RCBasins, DifferentialEquations, ProgressMeter
 
 ########################
 # Generate training data
