@@ -62,3 +62,8 @@ end
 NGRC(args...) = NGRC{Float64}(args...)
 
 num_features(model::NGRC) = size(model.weight, 2)
+
+function state_size(model::NGRC)
+    @unpack n, k, s = model
+    return n * ((k-1) * s + 1)
+end

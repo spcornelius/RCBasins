@@ -49,7 +49,7 @@ export align_xlabels!, align_ylabels!
 export setup_workers, is_logging
 
 # ngrc.jl
-export NGRC, num_features, build_feature_func
+export NGRC, num_features, build_feature_func, state_size
 
 # train.jl
 export train!
