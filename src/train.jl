@@ -66,10 +66,10 @@ end
 
 # single ODE solution (from solve in OrdinaryDiffEq)
 function train!(model, sol::AbstractTimeseriesSolution; kw...)
-    x_predict = train!(model, sol[:, :]; kw...)
+    x_predict = train!(model, Matrix(sol); kw...)
     return x_predict[1]
 end
 
 # Esnembled ODE solution
 train!(model, x_train::AbstractEnsembleSolution; kw...) =
-    train!(model, [sol[:, :] for sol in x_train]; kw...)
+    train!(model, [Matrix(sol) for sol in x_train]; kw...)
