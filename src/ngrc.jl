@@ -20,29 +20,30 @@ function build_feature_func(n::Integer, k::Integer, features::AbstractFeatures, 
     return f, length(out)
 end
 
-@with_kw struct NGRC{T, F}
+@with_kw struct NGRC{T, featuresType, fType}
     # dimension
-    n::Int64
+    n::Int
 
     # number of delays (k = 1 means no memory)
-    k::Int64
+    k::Int
 
     # time skipping between delayed states
-    s::Int64
+    s::Int
 
-    features::F
+    features::featuresType
 
     # presence of bias term
-    bias::Bool = true
+    bias::Bool
 
     # runtime-generated function to calculate features from a n x k state
-    f::Function
+    f::fType
 
     # weight matrix
     weight::Matrix{T}
     
-    function NGRC{T}(n::Integer, k::Integer, features::F; bias::Bool=true; s::Integer = 1) where 
-        {T <: Number, F <: AbstractFeatures}
+    function NGRC{T}(n::Integer, k::Integer, features::featuresType; 
+                     bias::Bool = true; s::Integer = 1) where 
+        {T <: AbstractFloat, featuresType <: AbstractFeatures}
 
         n ≥ 1 || error("must have n ≥ 1.")
 
@@ -55,7 +56,7 @@ end
         # weights are initialized to 0 before training
         weight = zeros(T, n, m)
 
-        new{T, F}(n, k, s, features, bias, f, weight)
+        new{T, featuresType, typeof(f)}(n, k, s, features, bias, f, weight)
     end
 end
 
