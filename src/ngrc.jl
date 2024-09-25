@@ -27,6 +27,9 @@ end
     # number of delays (k = 1 means no memory)
     k::Int64
 
+    # time skipping between delayed states
+    s::Int64
+
     features::F
 
     # presence of bias term
@@ -38,17 +41,21 @@ end
     # weight matrix
     weight::Matrix{T}
     
-    function NGRC{T}(n::Integer, k::Integer, features::F; bias::Bool=true) where 
+    function NGRC{T}(n::Integer, k::Integer, features::F; bias::Bool=true; s::Integer = 1) where 
         {T <: Number, F <: AbstractFeatures}
 
-        k ≥ 1 || error("must have k ≥ 1")
+        n ≥ 1 || error("must have n ≥ 1.")
+
+        k ≥ 1 || error("must have k ≥ 1.")
+
+        s ≥ 1 || error("must have s ≥ 1.")
 
         f, m = build_feature_func(n, k, features, bias)
 
         # weights are initialized to 0 before training
         weight = zeros(T, n, m)
 
-        new{T, F}(n, k, features, bias, f, weight)
+        new{T, F}(n, k, s, features, bias, f, weight)
     end
 end
 
