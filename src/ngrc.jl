@@ -9,18 +9,18 @@ function build_feature_func(n::Integer, k::Integer, features::AbstractFeatures, 
     out = vcat(bias_term, lin_terms, nonlin_terms)
 
     f_oop, f_iip = build_function(out, x, expression=Val{false})
-    function f(out::AbstractVector, x::AbstractVector)
+    function f(out, x)
         return f_iip(out, x)
     end
 
-    function f(x::AbstractVector)
+    function f(x)
         return f_oop(x)
     end
 
     return f, length(out)
 end
 
-@with_kw struct NGRC{T, featuresType, fType}
+@with_kw struct NGRC{T, featuresType, fType, cacheType}
     # dimension
     n::Int
 
@@ -40,9 +40,12 @@ end
 
     # weight matrix
     weight::Matrix{T}
+
+    # cache for storing calculated features
+    cache::cacheType
     
     function NGRC{T}(n::Integer, k::Integer, features::featuresType; 
-                     bias::Bool = true; s::Integer = 1) where 
+                     bias::Bool = true, s::Integer = 1) where 
         {T <: AbstractFloat, featuresType <: AbstractFeatures}
 
         n ≥ 1 || error("must have n ≥ 1.")
@@ -55,12 +58,13 @@ end
 
         # weights are initialized to 0 before training
         weight = zeros(T, n, m)
+        cache = DiffCache(zeros(T, m))
 
-        new{T, featuresType, typeof(f)}(n, k, s, features, bias, f, weight)
+        new{T, featuresType, typeof(f), typeof(cache)}(n, k, s, features, bias, f, weight, cache)
     end
 end
 
-NGRC(args...) = NGRC{Float64}(args...)
+NGRC(args...; kw...) = NGRC{Float64}(args...; kw...)
 
 num_features(model::NGRC) = size(model.weight, 2)
 

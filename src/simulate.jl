@@ -1,34 +1,66 @@
-function predict!(feat, x::AbstractArray{T}, model::NGRC) where {T}
-    @unpack n, k, weight = model
 
-    model.f(feat, x)
+function _matrix_view(x::AbstractArray, r::Integer, c::Integer)
+    Base.ReshapedArray(x, (r, c), ())
+end
+
+_matrix_view(x::AbstractMatrix, ::Integer, ::Integer) = x
+
+# If the NGRC state is contiguous, can make a strided matrix view,
+# which dramatically speeds up things like x[:, 1:s:...], used later...
+function _matrix_view(x::DenseArray, r::Integer, c::Integer)
+    sreshape(x, r, c)
+end
+
+_matrix_view(x::DenseMatrix, ::Integer, ::Integer) = StridedView(x)
+
+Base.@propagate_inbounds @views function predict!(x_new::AbstractArray{T}, x::AbstractArray, 
+                                                  model::NGRC, t) where {T}
+    @unpack n, k, s, weight = model
+    n_substates = (k - 1) * s + 1
+
+    @boundscheck begin 
+        ss = state_size(model)
+        length(x_new) == length(x) == ss ||
+            error("Expected both x and x_new to have length $ss.")
+    end
+
+    # views where rows are dimensions (1:n) and columns are time
+    x = _matrix_view(x, n, n_substates)
+    x_new = _matrix_view(x_new, n, n_substates)
+    g = get_tmp(model.cache, x)
+    model.f(g, x[:, 1:s:n_substates])
     
     # shift the delayed states left by k
-    older_states = @view x[1:n*(k-1)]
-    newer_states = @view x[end-n*(k-1)+1:end]
-    copy!(older_states, newer_states)
+    if k > 1
+        copy!(x_new[:, 1:end-1], x[:, 2:end])
+    end
+
+    copy!(x_new[:, end], x[:, end])
 
     # update the most recent state (last n elements)
-    out = @view x[end-n+1:end]
-    mul!(out, weight, feat, one(T), one(T))
+    mul!(x_new[:, end], weight, g, one(T), one(T))
     nothing
 end
 
-function simulate(model, x₀, N)
-    @unpack n, k = model
+@views function simulate(model, x₀::AbstractArray{T}, N) where {T}
+    @unpack n, k, s = model
+    n_substates = (k - 1) * s + 1
+    ss = state_size(model)
 
-    length(x₀) == n*k || 
-        error("Expected a warmed-up NGRC state of length n * k = $(n*k). Got length(x₀) == $(length(x₀)).")
-    x_save = zeros(n, N)
-    @views @. x_save[1:n*k] = x₀[:]
+    length(x₀) == ss || 
+        error("Expected a warmed-up NGRC state of length $(ss). Got length(x₀) == $(length(x₀)).")
 
-    x = copy(vec(x₀))
+    x_save = zeros(T, n, N+1)
+    @. x_save[1:ss] = x₀[:]
+    x_new = zeros(T, n, n_substates)
+    x = copy(reshape(x₀, n, n_substates))
 
-    feat = similar(x, num_features(model))
-
-    for t in k:N
-        predict!(feat, x, model)
-        @views @. x_save[:, t] = x[end-n+1:end]
+    for t in (k-1)*s+1:N
+        #@inbounds predict!(x_new, x_save[:, t-(k-1)*s:t], model, nothing)
+        @inbounds predict!(x_new, x, model, nothing)
+        # last n elements of x are the most recent state; save it
+        @. x_save[:, t+1] = x_new[:, end]
+        copy!(x, x_new)
     end
 
     return x_save

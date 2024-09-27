@@ -2,6 +2,7 @@ module RCBasins
 
 import Configurations: from_dict
 
+using BlockArrays
 using Colors
 using Combinatorics
 using Configurations
@@ -15,12 +16,15 @@ using LinearAlgebra
 using Makie
 using Mustache
 using Parameters
+using PreallocationTools
 using ProgressMeter
 using RuntimeGeneratedFunctions
 import SciMLBase: solve_batch
 using SciMLBase: AbstractEnsembleSolution, AbstractTimeseriesSolution, batch_func, tighten_container_eltype
 using Symbolics
 using SlurmClusterManager
+using StridedViews
+using ThreadsX
 using UnPack
 using YAML
 
@@ -52,7 +56,7 @@ export setup_workers, is_logging
 export NGRC, num_features, build_feature_func, state_size
 
 # train.jl
-export train!
+export train!, delay_embeddings, DelayEmbeddings
 
 # simulate.jl
 export simulate, predict!
